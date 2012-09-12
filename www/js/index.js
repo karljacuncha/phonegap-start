@@ -1,8 +1,12 @@
+var feedUrl;
+
 Binder = Backbone.Model.extend({});
 
 BinderList = Backbone.Collection.extend({
 	model: Binder,
-	url: 'js/feed.json',
+	url: function(){
+		return feedUrl;
+	},
 	parse: function(response){
 		return response.binder_list;
 	}
@@ -37,7 +41,8 @@ BinderIndexView = Backbone.View.extend({
  */
 var app = {		
     initialize: function(feed_link) {
-    	this.feed_link = feed_link;
+    	feedUrl = feed_link;
+    	
         app.report('device','pending');
         this.bind();
     },
@@ -53,7 +58,7 @@ var app = {
     deviceready: function() {
         app.report('device','complete');
         app.report('data','pending');
-
+        
         eIndex = new BinderIndexView;
         app.report('data','complete');
         
