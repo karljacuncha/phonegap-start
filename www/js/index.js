@@ -1,42 +1,61 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+Binder = Backbone.Model.extend({});
+
+BinderList = Backbone.Collection.extend({
+	model: Binder,
+	url: 'js/feed.json',
+	parse: function(response){
+		return response.binder_list;
+	}
+});
+
+IndexItemTemplate = _.template($('#listitem-template').html());
+ArticleItemTemplate = _.template($('#article-template').html());
+
+BinderIndexView = Backbone.View.extend({
+	el: $('#index_list'),
+	collection: new BinderList(),
+	
+	initialize: function () {
+        this.collection.bind("reset", this.render, this);
+		this.collection.fetch();
+    },
+    render: function () {
+        this.addAll();
+    },
+    addAll: function () {
+        this.collection.each(this.addOne);
+    },
+    addOne: function (model) {
+        $('#index_list').append(IndexItemTemplate(model.toJSON()));        
+        $('#pages').append(ArticleItemTemplate(model.toJSON()));
+    }
+});
+
+    	
+/**
+ * phone gap:
  */
-var app = {
-    initialize: function() {
+var app = {		
+    initialize: function(feed_link) {
+    	this.feed_link = feed_link;
+        app.report('device','pending');
         this.bind();
     },
     bind: function() {
         document.addEventListener('deviceready', this.deviceready, false);
     },
-    deviceready: function() {
-        // This is an event handler function, which means the scope is the event.
-        // So, we must explicitly called `app.report()` instead of `this.report()`.
-        app.report('deviceready');
-    },
-    report: function(id) {
+    report: function(id, state) {
         // Report the event in the console
-        console.log("Report: " + id);
+        console_log("Report: " + id + " : " + state);
+        $('.status').hide();
+        $('.status.' + id + '.' + state).show();
+    },
+    deviceready: function() {
+        app.report('device','complete');
+        app.report('data','pending');
 
-        // Toggle the state from "pending" to "complete" for the reported ID.
-        // Accomplished by adding .hide to the pending element and removing
-        // .hide from the complete element.
-        document.querySelector('#' + id + ' .pending').className += ' hide';
-        var completeElem = document.querySelector('#' + id + ' .complete');
-        completeElem.className = completeElem.className.split('hide').join('');
-    }
+        eIndex = new BinderIndexView;
+        app.report('data','complete');
+        
+    }    
 };
