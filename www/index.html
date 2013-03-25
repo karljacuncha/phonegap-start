@@ -1,82 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- live:  
-    --><script src="phonegap.js"></script>
-    <!-- dev     
+	<!-- live:
+    <script src="phonegap.js"></script>
+    -->
+    <!-- dev        -->
 	<script src="cordova-2.0.0.js"></script>
-	-->
-
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
     <link rel="stylesheet" href="css/styles.css" />
-    <title>FEED READER APP</title>
+    <link rel="stylesheet" href="css/jquery.dataTables.css" />
+    <title>IrishRail Demo App</title>
 </head>
 <body class="app" id="app">
-<header class="global_header">
-    <h1>FEED READER APP</h1>
+<header>
+    <h1 id="screen_title"></h1>
+
     <div id="statusbar">
        <p class="status device pending">Connecting to Device</p>
        <p class="status device complete">Device is Ready</p>
        <p class="status data pending">Loading Data</p>
        <p class="status data error">Error Loading Data</p>
     </div>
-    
-    <nav>
-        <a href="index.html">News</a>
-        <a href="business_index.html">Business</a>
-        <a href="sport_index.html">Sport</a>
-    </nav>
 </header>
+<a name="top"></a>
 
-<a name="nav"></a>
-<menu id="index_list" class="page index">
-</menu>
 
-<section id="pages">
-</section>
+<div id="wait">
+    <h1>Loading...</h1>
+</div>
+
+<table id="stationList">
+    <thead>
+        <tr>
+            <th>Station</th><th>Distance (km)</th><th></th>
+        </tr>
+    </thead>
+    <tfoot>
+    </tfoot>
+    <tbody>
+
+    </tbody>
+</table>
+
+
+<table id="stationDetail">
+    <thead>
+        <tr>
+            <th>Direction</th><th>Origin</th><th>Destination</th><th>Due</th><th>Time</th><th>Status</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <td colspan="6"><button class="back">Back</button></td>
+        </tr>
+    </tfoot>
+    <tbody>
+
+    </tbody>
+</table>
+
+<footer>
+
+</footer>
 
 <!-- Templates -->
-<script type="text/template" id="listitem-template">
-    <li class="indexitem">
-        <a href="#<%= binder_id %>">
-            <img src="<%= thumb64 %>" class="thumb" width="85" />
-            <h1><%= headline %></h1>
-            <time><%= publisheddate %></time>
-            <p><%= leadin %></p>
-        </a>
-    </li>
+<script type="text/template" id="stationRow">
+    <tr>
+        <td>%%STATION_NAME%%</td>
+        <td>%%STATION_DISTANCE%%</td>
+        <td><button class="details" data-code="%%STATION_LINK%%">View</button></td>
+    </tr>
 </script>
 
-<script type="text/template" id="article-template">
-    <article id="<%= binder_id %>" class="page binder">
-        <header>
-            <h1><%= headline %></h1>
-            <time><%= publisheddate %></time>
-        </header>
-        <div class="content">
-            <h3><%= leadin %></h3>
-            <img src="<%= thumb64 %>" class="thumb" width="160" />
-            <%= body %>
-        </div>
-        <footer>
-            <a href="#nav" class="button back">Back to top &uarr;</a>
-        </footer>
-    </article>
+<script type="text/template" id="trainRow">
+    <tr>
+        <td>%%DIRECTION%%</td>
+        <td>%%ORIGIN%%</td>
+        <td>%%DESTINATION%%</td>
+        <td>%%DUE%%</td>
+        <td>%%DUE_TIME%%</td>
+        <td>%%STATUS%%</td>
+    </tr>
+</script>
+<script type="text/template" id="trainRowError">
+    <tr>
+        <td colspan="6">No information Available</td>
+    </tr>
 </script>
 
 
-<script src="js/json2.js"></script>
 <script src="js/jquery.js"></script>
-<script src="js/underscore.js"></script>
-<script src="js/backbone.js"></script>
-
+<script src="js/jquery.dataTables.min.js"></script>
 <script src="js/core.js"></script>
 <script src="js/index.js"></script>
 
 <script type="text/javascript">
-    app.initialize("js/feed.json");
+    app.initialize("http://api.irishrail.ie/realtime/realtime.asmx/getAllStationsXML");
     /**
      * for dev...
      */

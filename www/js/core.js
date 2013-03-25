@@ -21,6 +21,19 @@ $.fn.exists = function() {
 	return this.length > 0;
 };
 
+
+function yqlJSON(url){
+	return "http://query.yahooapis.com/v1/public/yql?format=json&q=" + encodeURIComponent('select * from xml where url="' + url + '"');	
+}
+
+Number.prototype.toRad = function() {
+	return this * Math.PI / 180;
+}
+
+function roundish(num){
+	return Math.round(num*100)/100;
+}
+
 $.extend({
 	/**
 	 * hasValue - boolean check for usable values
