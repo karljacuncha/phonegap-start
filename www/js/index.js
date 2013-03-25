@@ -59,6 +59,7 @@ function LoadTimes(code){
 		$('#stationDetail').show();
 		
 		$('.back').on('click', function(){			
+			$('#stationDetail').hide();
 			$('#stationDetail_wrapper').hide();
 			$('#stationList_wrapper').show();
 			$('#screen_title').html("Station List");
