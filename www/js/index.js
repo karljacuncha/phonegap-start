@@ -97,8 +97,7 @@ function LoadTimes(code){
  * phone gap:
  */
 var app = {		
-    initialize: function(feed_link) {
-    	feedUrl = feed_link;    	
+    initialize: function() {
         app.report('device','pending');
         this.bind();
     },
