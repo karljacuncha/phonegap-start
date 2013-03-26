@@ -118,6 +118,7 @@ var app = {
 			// if position available, save & continue...
         	myLocation[0] = parseFloat(position.coords.latitude);
         	myLocation[1] = parseFloat(position.coords.longitude);				
+	        app.report('data','complete');
 	        LoadStations();
 	   	}
   	  	function onError(error) { 
@@ -126,6 +127,5 @@ var app = {
     	    LoadStations();
 	  	}
     	navigator.geolocation.getCurrentPosition(onSuccess, onError);        
-        app.report('data','complete');
     }    
 };
