@@ -21,15 +21,25 @@ $.fn.exists = function() {
 	return this.length > 0;
 };
 
-
+/**
+ * crossdomain & transforming of xml into json
+ * @param url for XML file
+ * @returns JSON from YQL service
+ */
 function yqlJSON(url){
 	return "http://query.yahooapis.com/v1/public/yql?format=json&q=" + encodeURIComponent('select * from xml where url="' + url + '"');	
 }
 
+/**
+ * convert to radians:
+ */
 Number.prototype.toRad = function() {
 	return this * Math.PI / 180;
 }
 
+/**
+ * Math.round with 2 decimal places:
+ */
 function roundish(num){
 	return Math.round(num*100)/100;
 }

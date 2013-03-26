@@ -4,9 +4,9 @@
 	<!-- live:-->
     <script src="phonegap.js"></script>
     <!-- dev
-	<script src="cordova-2.0.0.js"></script>
-	-->
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="cordova-2.5.0.js"></script>
+    -->
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
     <link rel="stylesheet" href="css/styles.css" />
@@ -14,88 +14,82 @@
     <title>IrishRail Demo App</title>
 </head>
 <body class="app" id="app">
-<header>
-    <h1 id="screen_title"></h1>
-
+    <header>
+        <h1 id="screen_title">Irish Rail</h1>
+    </header>
     <div id="statusbar">
-       <p class="status device pending">Connecting to Device</p>
+       <p class="status device pending">Connecting to Device...</p>
        <p class="status device complete">Device is Ready</p>
-       <p class="status data pending">Loading Data</p>
+       <p class="status data pending">Loading Data...</p>
        <p class="status data error">Error Loading Data</p>
     </div>
-</header>
-<a name="top"></a>
 
+    <div id="wait">
+        <h1>Loading...</h1>
+    </div>
 
-<div id="wait">
-    <h1>Loading...</h1>
-</div>
+    <section id="workarea">
 
-<table id="stationList">
-    <thead>
-        <tr>
-            <th>Station</th><th>Distance (km)</th><th></th>
-        </tr>
-    </thead>
-    <tfoot>
-    </tfoot>
-    <tbody>
-
-    </tbody>
-</table>
-
-
-<table id="stationDetail">
-    <thead>
-        <tr>
-            <th>Direction</th><th>Origin</th><th>Destination</th><th>Due</th><th>Time</th><th>Status</th>
-        </tr>
-    </thead>
-    <tfoot>
-        <tr>
-            <td colspan="6"><button class="back">Back</button></td>
-        </tr>
-    </tfoot>
-    <tbody>
-
-    </tbody>
-</table>
+    </section>
 
 <footer>
-
 </footer>
 
 <!-- Templates -->
-<script type="text/template" id="stationRow">
-    <tr>
-        <td>%%STATION_NAME%%</td>
-        <td>%%STATION_DISTANCE%%</td>
-        <td><button class="details" data-code="%%STATION_LINK%%">View</button></td>
-    </tr>
+<script type="text/template" id="stationList_tmpl">
+     <table id="stationList">
+        <thead>
+            <tr>
+                <th>Station</th><th>Distance (km)</th><th></th>
+            </tr>
+        </thead>
+        <tfoot>
+        </tfoot>
+        <tbody>
+        {{#objStation}}
+        <tr>
+            <td>{{ StationDesc  }}</td>
+            <td>{{ distance     }}</td>
+            <td><button class="details" data-code="{{ StationCode }}">View</button></td>
+        </tr>
+        {{/objStation}}
+        </tbody>
+    </table>
 </script>
 
-<script type="text/template" id="trainRow">
-    <tr>
-        <td>%%DIRECTION%%</td>
-        <td>%%ORIGIN%%</td>
-        <td>%%DESTINATION%%</td>
-        <td>%%DUE%%</td>
-        <td>%%DUE_TIME%%</td>
-        <td>%%STATUS%%</td>
-    </tr>
-</script>
-<script type="text/template" id="trainRowError">
-    <tr>
-        <td colspan="6">No information Available</td>
-    </tr>
-</script>
+<script type="text/template" id="stationDetail_tmpl">
+    <table id="stationDetail_">
+        <thead>
+            <tr>
+                <th>Direction</th><th>Origin</th><th>Destination</th><th>Due</th><th>Time</th><th>Status</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td colspan="6"><button class="back">Back</button></td>
+            </tr>
+        </tfoot>
+        <tbody>
+        {{#objStationData}}
+        <tr>
+            <td>{{ Direction    }}</td>
+            <td>{{ Origin       }}</td>
+            <td>{{ Desitination }}</td>
+            <td>{{ Duein        }}</td>
+            <td>{{ Exparrival   }}</td>
+            <td>{{ Status       }}</td>
+        </tr>
+        {{/objStationData}}
+        </tbody>
+    </table>
 
+</script>
 
 <script src="js/jquery.js"></script>
+<script src="js/mustache.js"></script>
 <script src="js/jquery.dataTables.min.js"></script>
 <script src="js/core.js"></script>
 <script src="js/index.js"></script>
-
 <script type="text/javascript">
     app.initialize();
     /**

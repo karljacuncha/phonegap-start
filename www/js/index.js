@@ -1,10 +1,7 @@
 
 var myLocation = [0,0],
 	stationsUrl = "http://api.irishrail.ie/realtime/realtime.asmx/getAllStationsXML",
-	statioData = "http://api.irishrail.ie/realtime/realtime.asmx/getStationDataByCodeXML_WithNumMins?NumMins=1440&StationCode=",
-	stations = []
-	dTable = null
-	max = 20;
+	statioData = "http://api.irishrail.ie/realtime/realtime.asmx/getStationDataByCodeXML_WithNumMins?NumMins=1440&StationCode=";
 
 
 function getDistance(lat, long){
@@ -20,77 +17,78 @@ function getDistance(lat, long){
     return roundish(R * c);
 }
 
-function LoadStations(){
-	$('#screen_title').html('Station List');
+function showWait(){
+	$('#wait').show();
+	$('.dataTables_wrapper').hide();
+}
+
+function showStations(){
+	$('#wait').hide();
+	$('.dataTables_wrapper').hide();
+	$('#stationList_wrapper').show();	
+	$('#screen_title').html("Station List");
+}
+function showDetail(code){
+	$('#wait').hide();
+	$('.dataTables_wrapper').hide();
+	$('#stationDetail_'+code+'_wrapper').show();	
+	$('#screen_title').html(code);
+}
+
+function LoadStations(){	
+	showWait();		
+	var tmpl = $('#stationList_tmpl').html();
+	
 	$.getJSON(yqlJSON(stationsUrl), function(data){
-		stations = data.query.results.ArrayOfObjStation.objStation;
-		for(i = 0; i < stations.length; i++){
-			var row = $('#stationRow').html();
-			row = row.replace('%%STATION_NAME%%', stations[i].StationDesc);
-			row = row.replace('%%STATION_DISTANCE%%', getDistance(stations[i].StationLatitude, stations[i].StationLongitude));
-			row = row.replace('%%STATION_LINK%%', stations[i].StationCode);
-						
-			$('#stationList tbody').append(row);
+		stations = data.query.results.ArrayOfObjStation;
+		// get distance offset for each station:
+		for(i = 0; i < stations.objStation.length; i++){
+			stations.objStation[i]['distance'] = getDistance(stations.objStation[i].StationLatitude, stations.objStation[i].StationLongitude);
 		}
+		// render template:
+		$('#workarea').append(Mustache.to_html(tmpl, stations));
+		
+		// apply datatable:
 	    $('#stationList').dataTable({
 	        "aaSorting": [[ 1, "asc" ]],
 	        "fnDrawCallback": function( oSettings ) {
-	        	$(".details").off('click');
+	        	$(".details").off('click');	// prevent callbacks stacking up
 	    	    $(".details").on('click', function(){
 	    	    	LoadTimes($(this).data('code'));
 	    	    })
 	        }
 	    });
+	    showStations();
 	});		
 }
 
 function LoadTimes(code){
-	try{
-		$('#stationDetail tbody').empty();
-		dTable.fnDestroy();
-	}catch(e){}
-
-	$('#stationList_wrapper').hide();
-	$('#wait').show();
+	showWait();		
+	code = code.trim()
 	
-	$.getJSON(yqlJSON(statioData + code), function(data){
-		$('#wait').hide();
-		$('#stationDetail_wrapper').show();
-		$('#stationDetail').show();
+	if($("#stationDetail_"+code).exists()){
+		showDetail(code);
+	}else{	
 		
-		$('.back').on('click', function(){			
-			$('#stationDetail').hide();
-			$('#stationDetail_wrapper').hide();
-			$('#stationList_wrapper').show();
-			$('#screen_title').html("Station List");
-		});
+		var tmpl = $('#stationDetail_tmpl').html();
+		tmpl = tmpl.replace('id="stationDetail_', 'id="stationDetail_'+code);
+		
+		$.getJSON(yqlJSON(statioData + code), function(data){
+			$('#wait').hide();
 
-		details = data.query.results.ArrayOfObjStationData.objStationData;
-		if(typeof details == "undefined"){
-			$('#stationDetail tbody').append($('#trainRowError').html());
-		}else if(details.length == 0){
-			$('#stationDetail tbody').append($('#trainRowError').html());
-		}else{			
-			$('#screen_title').html(details[0].Stationfullname);
+			details = data.query.results.ArrayOfObjStationData;
+			$('#workarea').append(Mustache.to_html(tmpl, details));
+
+			showDetail(code);
+			$('.back').on('click', function(){			
+				showStations();
+			});
 			
-			if(details.length < max){
-				max = details.length;
-			}		
-			for(i = 0; i < max; i++){
-				var row = $('#trainRow').html();
-				row = row.replace('%%DIRECTION%%', details[i].Direction);
-				row = row.replace('%%ORIGIN%%', details[i].Origin);
-				row = row.replace('%%DESTINATION%%', details[i].Destination);
-				row = row.replace('%%DUE%%', details[i].Duein);
-				row = row.replace('%%DUE_TIME%%', details[i].Exparrival);
-				row = row.replace('%%STATUS%%', details[i].Status);
-				$('#stationDetail tbody').append(row);
-			}
-			dTable = $('#stationDetail').dataTable({
-		        "aaSorting": [[ 3, "asc" ]]
-		    });
-		}
-	});
+			dTable = $('#stationDetail_'+code).dataTable({
+				"aaSorting": [[ 3, "asc" ]]
+			});			
+		});
+	}
 }
 
     	
@@ -118,12 +116,12 @@ var app = {
         function onSuccess(position) {
         	myLocation[0] = parseFloat(position.coords.latitude);
         	myLocation[1] = parseFloat(position.coords.longitude);
+            LoadStations();
     	}
     	function onError(error) { 
     	  // noop
     	}
     	navigator.geolocation.getCurrentPosition(onSuccess, onError);
-        LoadStations();
         
         app.report('data','complete');        
     }    
