@@ -91,7 +91,7 @@ function LoadTimes(code){
 	}
 }
 
-    	
+
 /**
  * phone gap:
  */
@@ -110,19 +110,22 @@ var app = {
         $('.status.' + id + '.' + state).show();
     },
     deviceready: function() {
+		showWait();		
         app.report('device','complete');
         app.report('data','pending');        
         
         function onSuccess(position) {
+			// if position available, save & continue...
         	myLocation[0] = parseFloat(position.coords.latitude);
-        	myLocation[1] = parseFloat(position.coords.longitude);
-            LoadStations();
-    	}
-    	function onError(error) { 
-    	  // noop
-    	}
-    	navigator.geolocation.getCurrentPosition(onSuccess, onError);
-        
-        app.report('data','complete');        
+        	myLocation[1] = parseFloat(position.coords.longitude);				
+	        LoadStations();
+	   	}
+  	  	function onError(error) { 
+			// on error, report and continue anyway...
+	        app.report('data','position');        
+    	    LoadStations();
+	  	}
+    	navigator.geolocation.getCurrentPosition(onSuccess, onError);        
+        app.report('data','complete');
     }    
 };
