@@ -114,18 +114,13 @@ var app = {
         app.report('device','complete');
         app.report('data','pending');        
         
-        function onSuccess(position) {
-			// if position available, save & continue...
-        	myLocation[0] = parseFloat(position.coords.latitude);
-        	myLocation[1] = parseFloat(position.coords.longitude);				
-	        app.report('data','complete');
-	        LoadStations();
-	   	}
-  	  	function onError(error) { 
-			// on error, report and continue anyway...
-	        app.report('data','position');        
-    	    LoadStations();
-	  	}
-    	navigator.geolocation.getCurrentPosition(onSuccess, onError);        
+    	navigator.geolocation.getCurrentPosition(function(position) {
+													myLocation[0] = parseFloat(position.coords.latitude);
+													myLocation[1] = parseFloat(position.coords.longitude);				
+												}, function(error) { 
+													app.report('data','position');        
+												});        
+   	    LoadStations();
+        app.report('data','complete');
     }    
 };
